@@ -17,6 +17,7 @@
 # 14. content-digest             — Weekly content digest (Fri 5:00am AEST)
 # 15. notification-poller        — Notification poller every 15min (8pm–12pm AEST)
 # 16. superbad-ads-report        — Daily Superbad ads report (10:03pm AEST)
+# 17. mindbody-sync              — Daily Mindbody→GHL sync (10:00am AEST)
 # =============================================================================
 
 services:
@@ -224,6 +225,18 @@ services:
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  mindbody-sync:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "mindbody-sync"
+      CRON_SCHEDULE: "0 0 * * *"
+      CRON_ENDPOINT: "/api/cron/sync"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://mindbody.mariopaguio.com"
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
