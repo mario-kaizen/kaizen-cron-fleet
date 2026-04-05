@@ -5,19 +5,14 @@
 # 2.  detect-wins                — Daily win detection (1:00am AEST)
 # 3.  smart-scanner              — Smart scanner every 4 hours
 # 4.  meta-ads-sync              — Daily Meta ads sync (midnight AEST)
-# 5.  meikaku-report             — Weekly Meikaku report (Sun 9:10pm AEST)
-# 6.  weekly-client-message      — Weekly client message (Sun 9:15pm AEST)
-# 7.  ads-review-morning         — Daily ads review morning (8:30pm AEST)
-# 8.  ads-review-afternoon       — Daily ads review afternoon (3:30am AEST)
-# 9.  ads-performance            — Daily ads performance (1:00pm AEST)
-# 10. stripe-notion-sync         — Daily Stripe→Notion sync (8:00pm AEST)
-# 11. notion-sync                — Notion sync every 15min (8pm–12pm AEST)
-# 12. client-health-engine       — Daily client health engine (7:30pm AEST)
-# 13. client-performance-sync    — Weekly client performance (Sun 9:05pm AEST)
-# 14. content-digest             — Weekly content digest (Fri 5:00am AEST)
-# 15. notification-poller        — Notification poller every 15min (8pm–12pm AEST)
-# 16. mindbody-sync              — Daily Mindbody→GHL sync (10:00am AEST)
-# 17. health-check               — Daily Lighthouse health ping (noon AEST)
+# 5.  stripe-notion-sync         — Daily Stripe→Notion sync (8:00pm AEST)
+# 6.  notion-sync                — Notion sync every 15min (8pm–12pm AEST)
+# 7.  client-health-engine       — Daily client health engine (7:30pm AEST)
+# 8.  client-performance-sync    — Weekly client performance (Sun 9:05pm AEST)
+# 9.  content-digest             — Weekly content digest (Fri 5:00am AEST)
+# 10. notification-poller        — Notification poller every 15min (8pm–12pm AEST)
+# 11. mindbody-sync              — Daily Mindbody→GHL sync (10:00am AEST)
+# 12. health-check               — Daily Lighthouse health ping (noon AEST)
 # =============================================================================
 
 services:
@@ -66,71 +61,6 @@ services:
       CRON_NAME: "meta-ads-sync"
       CRON_SCHEDULE: "0 0 * * *"
       CRON_ENDPOINT: "/api/cron/meta-ads"
-      CRON_SECRET: "${CRON_SECRET}"
-      SESSION_SECRET: "${SESSION_SECRET}"
-      BASE_URL: "https://lighthouse.mariopaguio.com"
-      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
-      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
-    restart: unless-stopped
-
-  meikaku-report:
-    build: ./cron-http
-    environment:
-      CRON_NAME: "meikaku-report"
-      CRON_SCHEDULE: "10 21 * * 0"
-      CRON_ENDPOINT: "/api/cron/meikaku"
-      CRON_SECRET: "${CRON_SECRET}"
-      SESSION_SECRET: "${SESSION_SECRET}"
-      BASE_URL: "https://lighthouse.mariopaguio.com"
-      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
-      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
-    restart: unless-stopped
-
-  weekly-client-message:
-    build: ./cron-http
-    environment:
-      CRON_NAME: "weekly-client-message"
-      CRON_SCHEDULE: "15 21 * * 0"
-      CRON_ENDPOINT: "/api/cron/weekly-client-message"
-      CRON_SECRET: "${CRON_SECRET}"
-      SESSION_SECRET: "${SESSION_SECRET}"
-      BASE_URL: "https://lighthouse.mariopaguio.com"
-      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
-      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
-    restart: unless-stopped
-
-  ads-review-morning:
-    build: ./cron-http
-    environment:
-      CRON_NAME: "ads-review-morning"
-      CRON_SCHEDULE: "30 20 * * *"
-      CRON_ENDPOINT: "/api/cron/ads-review"
-      CRON_SECRET: "${CRON_SECRET}"
-      SESSION_SECRET: "${SESSION_SECRET}"
-      BASE_URL: "https://lighthouse.mariopaguio.com"
-      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
-      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
-    restart: unless-stopped
-
-  ads-review-afternoon:
-    build: ./cron-http
-    environment:
-      CRON_NAME: "ads-review-afternoon"
-      CRON_SCHEDULE: "30 3 * * *"
-      CRON_ENDPOINT: "/api/cron/ads-review"
-      CRON_SECRET: "${CRON_SECRET}"
-      SESSION_SECRET: "${SESSION_SECRET}"
-      BASE_URL: "https://lighthouse.mariopaguio.com"
-      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
-      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
-    restart: unless-stopped
-
-  ads-performance:
-    build: ./cron-http
-    environment:
-      CRON_NAME: "ads-performance"
-      CRON_SCHEDULE: "0 13 * * *"
-      CRON_ENDPOINT: "/api/cron/ads-performance"
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
