@@ -1,3 +1,24 @@
+# =============================================================================
+# Kaizen Cron Fleet — All Services
+# =============================================================================
+# 1.  sync-stripe-revenue        — Daily Stripe revenue sync (6:30pm AEST)
+# 2.  detect-wins                — Daily win detection (1:00am AEST)
+# 3.  smart-scanner              — Smart scanner every 4 hours
+# 4.  meta-ads-sync              — Daily Meta ads sync (midnight AEST)
+# 5.  meikaku-report             — Weekly Meikaku report (Sun 9:10pm AEST)
+# 6.  weekly-client-message      — Weekly client message (Sun 9:15pm AEST)
+# 7.  ads-review-morning         — Daily ads review morning (8:30pm AEST)
+# 8.  ads-review-afternoon       — Daily ads review afternoon (3:30am AEST)
+# 9.  ads-performance            — Daily ads performance (1:00pm AEST)
+# 10. stripe-notion-sync         — Daily Stripe→Notion sync (8:00pm AEST)
+# 11. notion-sync                — Notion sync every 15min (8pm–12pm AEST)
+# 12. client-health-engine       — Daily client health engine (7:30pm AEST)
+# 13. client-performance-sync    — Weekly client performance (Sun 9:05pm AEST)
+# 14. content-digest             — Weekly content digest (Fri 5:00am AEST)
+# 15. notification-poller        — Notification poller every 15min (8pm–12pm AEST)
+# 16. superbad-ads-report        — Daily Superbad ads report (10:03pm AEST)
+# =============================================================================
+
 services:
   sync-stripe-revenue:
     build: ./cron-http
@@ -109,6 +130,97 @@ services:
       CRON_NAME: "ads-performance"
       CRON_SCHEDULE: "0 13 * * *"
       CRON_ENDPOINT: "/api/cron/ads-performance"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  stripe-notion-sync:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "stripe-notion-sync"
+      CRON_SCHEDULE: "0 20 * * *"
+      CRON_ENDPOINT: "/api/cron/stripe-notion-sync"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  notion-sync:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "notion-sync"
+      CRON_SCHEDULE: "*/15 20-23,0-12 * * *"
+      CRON_ENDPOINT: "/api/cron/notion-sync"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  client-health-engine:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "client-health-engine"
+      CRON_SCHEDULE: "30 19 * * *"
+      CRON_ENDPOINT: "/api/cron/client-health-engine"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  client-performance-sync:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "client-performance-sync"
+      CRON_SCHEDULE: "5 21 * * 0"
+      CRON_ENDPOINT: "/api/cron/client-performance-sync"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  content-digest:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "content-digest"
+      CRON_SCHEDULE: "0 5 * * 5"
+      CRON_ENDPOINT: "/api/cron/content-digest"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  notification-poller:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "notification-poller"
+      CRON_SCHEDULE: "*/15 20-23,0-12 * * *"
+      CRON_ENDPOINT: "/api/cron/notification-poller"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  superbad-ads-report:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "superbad-ads-report"
+      CRON_SCHEDULE: "3 22 * * *"
+      CRON_ENDPOINT: "/api/cron/superbad-ads-report"
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
