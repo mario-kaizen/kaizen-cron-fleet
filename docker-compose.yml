@@ -12,6 +12,7 @@
 # 9.  notification-poller        — Notification poller every 15min (8pm–12pm AEST)
 # 10. mindbody-sync              — Daily Mindbody→GHL sync (10:00am AEST)
 # 11. health-check               — Daily Lighthouse health ping (noon AEST)
+# 12. wodify-sync                — Daily Wodify→GHL sync (9:00am AEST)
 # NOTE: content-digest moved to local launchd (Fri 3pm AEST) — 2026-04-05
 # =============================================================================
 
@@ -154,6 +155,19 @@ services:
       CRON_ENDPOINT: "/api/cron/sync"
       CRON_SECRET: "${CRON_SECRET}"
       BASE_URL: "https://mindbody.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  wodify-sync:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "wodify-sync"
+      CRON_SCHEDULE: "0 9 * * *"
+      CRON_ENDPOINT: "/api/cron/wodify-sync"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
