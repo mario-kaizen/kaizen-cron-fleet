@@ -2,7 +2,7 @@
 # Kaizen Cron Fleet — Active Services
 # =============================================================================
 # 1. mindbody-sync    | Daily Mindbody→GHL sync (10:00am AEST)
-# 2. wodify-sync      | Daily Wodify→GHL sync (9:00am AEST)
+# 2. wodify-sync      | Daily Wodify→GHL sync (9:00am Sydney AEST = 23:00 UTC)
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -27,7 +27,7 @@ services:
     build: ./cron-http
     environment:
       CRON_NAME: "wodify-sync"
-      CRON_SCHEDULE: "0 9 * * *"
+      CRON_SCHEDULE: "0 23 * * *"  # 9am Sydney AEST (UTC+10)
       CRON_ENDPOINT: "/api/cron/wodify-sync"
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
