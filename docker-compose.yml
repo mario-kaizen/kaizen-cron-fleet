@@ -1,8 +1,10 @@
 # =============================================================================
 # Kaizen Cron Fleet — Active Services
 # =============================================================================
-# 1. mindbody-sync    | Daily Mindbody→GHL sync (10:00am AEST)
-# 2. wodify-sync      | Daily Wodify→GHL sync (9:00am Sydney AEST = 23:00 UTC)
+# 1. mindbody-sync       | Daily Mindbody→GHL sync (10:00am AEST)
+# 2. wodify-sync         | Daily Wodify→GHL sync (9:00am Sydney AEST = 23:00 UTC)
+# 3. funnel-capi-match   | Every 15min: match STRONG funnel widget captures to
+#                          GHL account-created contacts → fire Meta CAPI Lead.
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -32,6 +34,18 @@ services:
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  funnel-capi-match:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "funnel-capi-match"
+      CRON_SCHEDULE: "*/15 * * * *"  # every 15 min — matcher's GHL window is 30 min
+      CRON_ENDPOINT: "/api/cron/capi-match"
+      CRON_SECRET: "${FUNNEL_CRON_SECRET}"  # funnel platform has its own secret
+      BASE_URL: "https://join.strongpilates.ca"
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
