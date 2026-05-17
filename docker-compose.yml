@@ -1,12 +1,17 @@
 # =============================================================================
 # Kaizen Cron Fleet — Active Services
 # =============================================================================
-# 1. mindbody-sync           | Daily Mindbody→GHL sync (10:00am AEST)
-# 2. wodify-sync             | Daily Wodify→GHL sync (9:00am Sydney AEST = 23:00 UTC)
-# 3. funnel-capi-match       | Every 15min: match STRONG funnel widget captures to
-#                              GHL account-created contacts → fire Meta CAPI Lead.
-# 4. strong-intro-purchases  | Daily Grow→Lighthouse refresh of intro offer purchase
-#                              counts for STRONG DWY clients (23:00 UTC = 9am Sydney).
+# 1. mindbody-sync               | Daily Mindbody→GHL sync (10:00am AEST)
+# 2. wodify-sync                 | Daily Wodify→GHL sync (9:00am Sydney AEST = 23:00 UTC)
+# 3. funnel-capi-match           | Every 15min: match STRONG funnel widget captures to
+#                                  GHL account-created contacts → fire Meta CAPI Lead.
+# 4. strong-intro-purchases      | Daily Grow→Lighthouse refresh of intro offer purchase
+#                                  counts for STRONG DWY clients (23:00 UTC = 9am Sydney).
+# 5. strong-intel-outcome-pull   | Daily STRONG Competitive Intel pull (12:00 UTC).
+#                                  Fires after every TZ's "yesterday" is fully complete
+#                                  (latest TZ is UTC-10; 12:00 UTC = 02:00 local for them).
+#                                  Writes one LocationOutcomeDaily row per studio for
+#                                  each studio's local yesterday.
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -58,6 +63,19 @@ services:
       CRON_NAME: "strong-intro-purchases"
       CRON_SCHEDULE: "0 23 * * *"  # 9am Sydney AEST = 23:00 UTC — daily refresh of intro offer counts for STRONG DWY clients
       CRON_ENDPOINT: "/api/cron/strong-intro-purchases"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  strong-intel-outcome-pull:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "strong-intel-outcome-pull"
+      CRON_SCHEDULE: "0 12 * * *"  # 12:00 UTC daily — after every studio TZ's "yesterday" is done (latest TZ in fleet is UTC-10, which is 02:00 local at 12:00 UTC)
+      CRON_ENDPOINT: "/api/cron/strong-intel-outcome-pull"
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
