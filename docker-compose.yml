@@ -12,6 +12,9 @@
 #                                  (latest TZ is UTC-10; 12:00 UTC = 02:00 local for them).
 #                                  Writes one LocationOutcomeDaily row per studio for
 #                                  each studio's local yesterday.
+# 6. ghl-crm-sync                | Daily per-client GHL CRM pull (contacts +
+#                                  opportunities to GhlCrmSnapshot) feeding the client
+#                                  pages + portal (19:00 UTC = 5am Sydney AEST).
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -76,6 +79,19 @@ services:
       CRON_NAME: "strong-intel-outcome-pull"
       CRON_SCHEDULE: "0 12 * * *"  # 12:00 UTC daily — after every studio TZ's "yesterday" is done (latest TZ in fleet is UTC-10, which is 02:00 local at 12:00 UTC)
       CRON_ENDPOINT: "/api/cron/strong-intel-outcome-pull"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  ghl-crm-sync:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "ghl-crm-sync"
+      CRON_SCHEDULE: "0 19 * * *"  # 5am Sydney AEST (19:00 UTC), clear of the 9am GHL jobs
+      CRON_ENDPOINT: "/api/sync/ghl-crm"
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
