@@ -15,6 +15,9 @@
 # 6. ghl-crm-sync                | Daily per-client GHL CRM pull (contacts +
 #                                  opportunities to GhlCrmSnapshot) feeding the client
 #                                  pages + portal (19:00 UTC = 5am Sydney AEST).
+# 7. launchpad-retention-roster   | Refresh the three BBB Wodify rosters every four hours.
+# 8. launchpad-retention-attendance | Refresh BBB attendance and retention signals hourly.
+# 9. launchpad-retention-grow     | Refresh BBB Grow context hourly.
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -95,6 +98,42 @@ services:
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  launchpad-retention-roster:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "launchpad-retention-roster"
+      CRON_SCHEDULE: "15 */4 * * *"
+      CRON_ENDPOINT: "/api/cron/retention-sync?job=roster"
+      CRON_SECRET: "${LAUNCHPAD_CRON_SECRET}"
+      BASE_URL: "${LAUNCHPAD_BASE_URL}"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  launchpad-retention-attendance:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "launchpad-retention-attendance"
+      CRON_SCHEDULE: "45 * * * *"
+      CRON_ENDPOINT: "/api/cron/retention-sync?job=attendance"
+      CRON_SECRET: "${LAUNCHPAD_CRON_SECRET}"
+      BASE_URL: "${LAUNCHPAD_BASE_URL}"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  launchpad-retention-grow:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "launchpad-retention-grow"
+      CRON_SCHEDULE: "25 * * * *"
+      CRON_ENDPOINT: "/api/cron/retention-sync?job=grow"
+      CRON_SECRET: "${LAUNCHPAD_CRON_SECRET}"
+      BASE_URL: "${LAUNCHPAD_BASE_URL}"
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
