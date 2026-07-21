@@ -7,11 +7,13 @@
 #                                  GHL account-created contacts → fire Meta CAPI Lead.
 # 4. strong-intro-purchases      | Daily Grow→Lighthouse refresh of intro offer purchase
 #                                  counts for STRONG DWY clients (23:00 UTC = 9am Sydney).
-# 5. strong-intel-outcome-pull   | Daily STRONG Competitive Intel pull (12:00 UTC).
-#                                  Fires after every TZ's "yesterday" is fully complete
-#                                  (latest TZ is UTC-10; 12:00 UTC = 02:00 local for them).
-#                                  Writes one LocationOutcomeDaily row per studio for
-#                                  each studio's local yesterday.
+# 5. strong-intel-outcome-pull   | STRONG Competitive Intel pull, 4x daily (02:00,
+#                                  05:00, 12:00, 20:00 UTC = 12pm, 3pm, 10pm, 6am
+#                                  Sydney). Writes one LocationOutcomeDaily row per
+#                                  studio for each studio's local yesterday. Was a
+#                                  single 12:00 UTC run until 2026-07-21, which left
+#                                  Sydney 22 hours stale and 91 of 130 studios waiting
+#                                  over half a day.
 # 6. ghl-crm-sync                | Daily per-client GHL CRM pull (contacts +
 #                                  opportunities to GhlCrmSnapshot) feeding the client
 #                                  pages + portal (19:00 UTC = 5am Sydney AEST).
@@ -80,7 +82,17 @@ services:
     build: ./cron-http
     environment:
       CRON_NAME: "strong-intel-outcome-pull"
-      CRON_SCHEDULE: "0 12 * * *"  # 12:00 UTC daily — after every studio TZ's "yesterday" is done (latest TZ in fleet is UTC-10, which is 02:00 local at 12:00 UTC)
+      # 02:00, 05:00, 12:00, 20:00 UTC = 12pm, 3pm, 10pm, 6am Sydney (AEST, UTC+10).
+      # Four runs, each timed to the moment a block of studio timezones finishes its
+      # local day, so every studio's "yesterday" is on the board at each of the four
+      # times Mario reads the leaderboard. A single daily run cannot do this: the fleet
+      # spans 22 hours of local midnights (Auckland 12:00 UTC round to Los Angeles
+      # 07:00 UTC), so whichever hour you pick, the first timezone to finish waits for
+      # the last. At 12:00 UTC only Auckland was current and Sydney lagged 22 hours.
+      # Each run re-pulls every studio's local yesterday rather than skipping ones
+      # already stored. That is deliberate: intro_offer_purchase_date is a DATE field
+      # staff can backdate, so the repeat pull picks up late entries the same day.
+      CRON_SCHEDULE: "0 2,5,12,20 * * *"
       CRON_ENDPOINT: "/api/cron/strong-intel-outcome-pull"
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
