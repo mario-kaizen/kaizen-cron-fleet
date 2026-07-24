@@ -20,6 +20,14 @@
 # 7. launchpad-retention-roster   | Refresh the three BBB Wodify rosters every four hours.
 # 8. launchpad-retention-attendance | Refresh BBB attendance and retention signals hourly.
 # 9. launchpad-retention-grow     | Refresh BBB Grow context hourly.
+# 10. athletex-core-bridge        | Every 5min: release due Athlete X journey
+#                                  continuations, retry failed PushPress Core events,
+#                                  and enrol pending member backfills. Added 2026-07-25
+#                                  after the 07-24 cutover shipped with no scheduler:
+#                                  26 continuations sat pending with the first due
+#                                  10:03 AEST, and a continuation only releases when
+#                                  this route runs, so every mid-journey member would
+#                                  have stalled silently.
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -146,6 +154,23 @@ services:
       CRON_ENDPOINT: "/api/cron/retention-sync?job=grow"
       CRON_SECRET: "${LAUNCHPAD_CRON_SECRET}"
       BASE_URL: "${LAUNCHPAD_BASE_URL}"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  athletex-core-bridge:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "athletex-core-bridge"
+      # Every 5 min. The route is idempotent and cheap when idle (it returns zero
+      # counts unless a continuation is due, an event is retryable, or a member
+      # backfill is pending), so the cost of a tight cadence is near nothing while
+      # the cost of a slow one is a member's next message arriving hours late.
+      CRON_SCHEDULE: "*/5 * * * *"
+      CRON_ENDPOINT: "/api/cron/athletex-core-bridge"
+      CRON_SECRET: "${CRON_SECRET}"
+      SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
