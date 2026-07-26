@@ -28,6 +28,14 @@
 #                                  10:03 AEST, and a continuation only releases when
 #                                  this route runs, so every mid-journey member would
 #                                  have stalled silently.
+# 11. launchpad-numbers-warm      | Every 4min: ping the Launchpad numbers route so
+#                                  every cache layer stays warm. Warm the route costs
+#                                  ~5s; a Lighthouse restart raises that to ~25-30s
+#                                  because live Stripe work sits behind it, and this
+#                                  ping means no human request ever pays that cost.
+#                                  Uses the warm-ping image, not cron-http: the target
+#                                  route is GET-only and 405s on cron-http's hardcoded
+#                                  POST + x-cron-secret/x-session-secret shape.
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -170,6 +178,18 @@ services:
       CRON_ENDPOINT: "/api/cron/athletex-core-bridge"
       CRON_SECRET: "${CRON_SECRET}"
       SESSION_SECRET: "${SESSION_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  launchpad-numbers-warm:
+    build: ./warm-ping
+    environment:
+      CRON_NAME: "launchpad-numbers-warm"
+      CRON_SCHEDULE: "*/4 * * * *"
+      CRON_ENDPOINT: "/api/integrations/launchpad/numbers"
+      CRON_SECRET: "${LAUNCHPAD_NUMBERS_API_KEY}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
