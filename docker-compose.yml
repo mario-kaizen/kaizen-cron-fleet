@@ -194,3 +194,27 @@ services:
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
+
+  stripe-reconcile:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "stripe-reconcile"
+      CRON_SCHEDULE: "45 16 * * *"  # 2:45am Sydney AEST (16:45 UTC), nightly heal for the Stripe mirror
+      CRON_ENDPOINT: "/api/cron/stripe-reconcile"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  mrr-snapshot:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "mrr-snapshot"
+      CRON_SCHEDULE: "5 14 * * *"  # 12:05am Sydney AEST (14:05 UTC), stamps the daily MrrSnapshot row
+      CRON_ENDPOINT: "/api/cron/mrr-snapshot"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
