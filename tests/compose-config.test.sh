@@ -38,7 +38,7 @@ expected_services='[
   "launchpad-retention-grow",
   "launchpad-retention-roster",
   "mindbody-sync",
-  "mindbody-webhook-dispatcher",
+  "mindbody-webhook-dispatch",
   "mindbody-webhook-health",
   "mrr-snapshot",
   "stripe-reconcile",
@@ -56,11 +56,11 @@ if ! jq -e \
 fi
 
 if ! jq -e '
-  .services["mindbody-webhook-dispatcher"] as $service
+  .services["mindbody-webhook-dispatch"] as $service
   | ($service.build.context | endswith("/cron-http"))
     and $service.environment.BASE_URL == "https://lighthouse.mariopaguio.com"
     and $service.environment.CRON_ENDPOINT == "/api/cron/mindbody-webhooks"
-    and $service.environment.CRON_NAME == "mindbody-webhook-dispatcher"
+    and $service.environment.CRON_NAME == "mindbody-webhook-dispatch"
     and $service.environment.CRON_SCHEDULE == "* * * * *"
     and $service.environment.CRON_SECRET == "test-cron-secret"
     and $service.environment.SLACK_BOT_TOKEN == "test-slack-token"

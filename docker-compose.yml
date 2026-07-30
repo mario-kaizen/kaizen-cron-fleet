@@ -38,7 +38,7 @@
 #                                  POST + x-cron-secret/x-session-secret shape.
 # 12. stripe-reconcile             | Nightly reconciliation for the Stripe mirror.
 # 13. mrr-snapshot                 | Daily MRR snapshot after Stripe reconciliation.
-# 14. mindbody-webhook-dispatcher  | Every minute: process the durable Mindbody inbox.
+# 14. mindbody-webhook-dispatch     | Every minute: process the durable Mindbody inbox.
 # 15. mindbody-webhook-health      | Hourly at minute 12: audit subscription, intake,
 #                                  dispatcher, site coverage, and paid API call health.
 #
@@ -224,10 +224,10 @@ services:
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
 
-  mindbody-webhook-dispatcher:
+  mindbody-webhook-dispatch:
     build: ./cron-http
     environment:
-      CRON_NAME: "mindbody-webhook-dispatcher"
+      CRON_NAME: "mindbody-webhook-dispatch"
       CRON_SCHEDULE: "* * * * *"
       CRON_ENDPOINT: "/api/cron/mindbody-webhooks"
       CRON_SECRET: "${CRON_SECRET}"
