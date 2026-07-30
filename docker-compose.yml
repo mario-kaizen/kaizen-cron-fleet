@@ -36,6 +36,11 @@
 #                                  Uses the warm-ping image, not cron-http: the target
 #                                  route is GET-only and 405s on cron-http's hardcoded
 #                                  POST + x-cron-secret/x-session-secret shape.
+# 12. stripe-reconcile             | Nightly reconciliation for the Stripe mirror.
+# 13. mrr-snapshot                 | Daily MRR snapshot after Stripe reconciliation.
+# 14. mindbody-webhook-dispatcher  | Every minute: process the durable Mindbody inbox.
+# 15. mindbody-webhook-health      | Hourly at minute 12: audit subscription, intake,
+#                                  dispatcher, site coverage, and paid API call health.
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -213,6 +218,30 @@ services:
       CRON_NAME: "mrr-snapshot"
       CRON_SCHEDULE: "5 14 * * *"  # 12:05am Sydney AEST (14:05 UTC), stamps the daily MrrSnapshot row
       CRON_ENDPOINT: "/api/cron/mrr-snapshot"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  mindbody-webhook-dispatcher:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "mindbody-webhook-dispatcher"
+      CRON_SCHEDULE: "* * * * *"
+      CRON_ENDPOINT: "/api/cron/mindbody-webhooks"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
+  mindbody-webhook-health:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "mindbody-webhook-health"
+      CRON_SCHEDULE: "12 * * * *"
+      CRON_ENDPOINT: "/api/cron/mindbody-webhook-health"
       CRON_SECRET: "${CRON_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
