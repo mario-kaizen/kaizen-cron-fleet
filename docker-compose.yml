@@ -250,6 +250,8 @@ services:
 
   winning-creatives:
     build: ./cron-http
+    # Coolify injects app-wide env vars, so explicitly remove Slack before crond.
+    entrypoint: ["/bin/sh", "-c", "unset SLACK_BOT_TOKEN SLACK_CHANNEL_ID; exec /entrypoint.sh"]
     environment:
       CRON_NAME: "winning-creatives"
       # Monday 10:00 UTC, after the prior week closes across account timezones.
