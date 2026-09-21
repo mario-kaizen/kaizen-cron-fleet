@@ -247,3 +247,14 @@ services:
       SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
+
+  winning-creatives:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "winning-creatives"
+      # Monday 10:00 UTC, after the prior week closes across account timezones.
+      CRON_SCHEDULE: "0 10 * * 1"
+      CRON_ENDPOINT: "/api/cron/winning-creatives"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+    restart: unless-stopped
