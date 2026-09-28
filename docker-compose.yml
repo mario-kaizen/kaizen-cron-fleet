@@ -254,8 +254,9 @@ services:
     entrypoint: ["/bin/sh", "-c", "unset SLACK_BOT_TOKEN SLACK_CHANNEL_ID; exec /entrypoint.sh"]
     environment:
       CRON_NAME: "winning-creatives"
-      # Monday 10:00 UTC, after the prior week closes across account timezones.
-      CRON_SCHEDULE: "0 10 * * 1"
+      # Start early enough to publish before the Monday 8am meeting review.
+      TZ: "Australia/Sydney"
+      CRON_SCHEDULE: "0 7 * * 1"
       CRON_ENDPOINT: "/api/cron/winning-creatives"
       CRON_SECRET: "${CRON_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
