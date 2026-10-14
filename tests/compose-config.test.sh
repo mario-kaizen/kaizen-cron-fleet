@@ -41,9 +41,11 @@ expected_services='[
   "mindbody-webhook-dispatch",
   "mindbody-webhook-health",
   "mrr-snapshot",
+  "paid-media-briefing",
   "stripe-reconcile",
   "strong-intel-outcome-pull",
   "strong-intro-purchases",
+  "winning-creatives",
   "wodify-sync"
 ]'
 
@@ -51,7 +53,7 @@ if ! jq -e \
   --argjson expected "${expected_services}" \
   '(.services | keys | sort) == ($expected | sort)' \
   "${rendered_config}" > /dev/null; then
-  echo "Rendered Compose service inventory does not match the expected 15 services." >&2
+  echo "Rendered Compose service inventory does not match the expected 17 services." >&2
   exit 1
 fi
 
@@ -87,4 +89,4 @@ if ! jq -e '
   exit 1
 fi
 
-echo "Compose config contains all 15 services and the two Mindbody schedules."
+echo "Compose config contains all 17 services and the two Mindbody schedules."
