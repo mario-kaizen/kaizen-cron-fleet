@@ -41,6 +41,9 @@
 # 14. mindbody-webhook-dispatch     | Every minute: process the durable Mindbody inbox.
 # 15. mindbody-webhook-health      | Hourly at minute 12: audit subscription, intake,
 #                                  dispatcher, site coverage, and paid API call health.
+# 16. paid-media-briefing          | Nightly Paid Media briefing at 11:30pm Sydney
+#                                  (Sydney time, so daylight saving cannot move it),
+#                                  after the Core outcome pull's 12:00 UTC refresh.
 #
 # Slimmed 2026-05-13: removed 10 token-heavy / unused services
 # (sync-stripe-revenue, detect-wins, smart-scanner, meta-ads-sync,
@@ -260,4 +263,20 @@ services:
       CRON_ENDPOINT: "/api/cron/winning-creatives"
       CRON_SECRET: "${CRON_SECRET}"
       BASE_URL: "https://lighthouse.mariopaguio.com"
+    restart: unless-stopped
+
+  paid-media-briefing:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "paid-media-briefing"
+      # 11:30pm Sydney every night. The Core outcome pull refreshes at 12:00 UTC
+      # (11pm Sydney in daylight saving, 10pm otherwise) and takes about 4 minutes,
+      # so the briefing always reads yesterday's studio intros after that refresh.
+      TZ: "Australia/Sydney"
+      CRON_SCHEDULE: "30 23 * * *"
+      CRON_ENDPOINT: "/api/cron/paid-media-briefing"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped

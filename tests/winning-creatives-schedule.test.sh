@@ -11,6 +11,12 @@ docker compose -f "$repo_root/docker-compose.yml" config --format json | jq -e '
  $s.environment.TZ == "Australia/Sydney" and
  $s.environment.CRON_ENDPOINT == "/api/cron/winning-creatives" and
  ($s.entrypoint[2] | contains("unset SLACK_BOT_TOKEN SLACK_CHANNEL_ID")) and
- ([.services | to_entries[] | select(.key != "winning-creatives") | .value.environment.TZ // empty] | length == 0)
+ ([.services | to_entries[] | select(.key != "winning-creatives" and .key != "paid-media-briefing") | .value.environment.TZ // empty] | length == 0)
 ' >/dev/null
-printf 'Winning Creatives collects Monday 7am Sydney; other service timezones unchanged.\n'
+docker compose -f "$repo_root/docker-compose.yml" config --format json | jq -e '
+ .services["paid-media-briefing"] as $s |
+ $s.environment.CRON_SCHEDULE == "30 23 * * *" and
+ $s.environment.TZ == "Australia/Sydney" and
+ $s.environment.CRON_ENDPOINT == "/api/cron/paid-media-briefing"
+' >/dev/null
+printf 'Winning Creatives collects Monday 7am Sydney; Paid Media briefs nightly 11:30pm Sydney; other service timezones unchanged.\n'
