@@ -227,6 +227,18 @@ services:
       SLACK_CHANNEL_ID: "C0ALM9P8DQD"
     restart: unless-stopped
 
+  marketing-context-core:
+    build: ./cron-http
+    environment:
+      CRON_NAME: "marketing-context-core"
+      CRON_SCHEDULE: "30 18 * * *"  # 4:30am Sydney AEST (5:30am in daylight saving): STRONG offers and rates from Core onto the client page
+      CRON_ENDPOINT: "/api/cron/marketing-context-core"
+      CRON_SECRET: "${CRON_SECRET}"
+      BASE_URL: "https://lighthouse.mariopaguio.com"
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_CHANNEL_ID: "C0ALM9P8DQD"
+    restart: unless-stopped
+
   mindbody-webhook-dispatch:
     build: ./cron-http
     environment:
